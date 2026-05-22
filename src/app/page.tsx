@@ -1,11 +1,12 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-white">
       {/* Nav */}
       <nav className="flex items-center justify-between px-8 py-5 border-b border-gray-100">
-        <span className="text-xl font-bold tracking-tight text-[#1a2744]">InPro.ai</span>
+        <Image src="/logo.svg" alt="InPro.ai" width={110} height={50} priority />
         <div className="flex items-center gap-6">
           <Link href="/login" className="text-sm font-medium text-gray-600 hover:text-[#1a2744] transition-colors">
             Sign in
@@ -232,7 +233,7 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="border-t border-gray-100 py-8">
         <div className="max-w-5xl mx-auto px-8 flex items-center justify-between">
-          <span className="text-sm font-bold text-[#1a2744]">InPro.ai</span>
+          <Image src="/logo.svg" alt="InPro.ai" width={80} height={36} />
           <p className="text-xs text-gray-400">© 2026 InPro.ai. All rights reserved.</p>
         </div>
       </footer>

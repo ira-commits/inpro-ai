@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 100">
+  <!-- Chat bubble background (rounded rect) -->
+  <rect x="0" y="0" width="84" height="76" rx="13" fill="#29B6F6"/>
+  <!-- Chat bubble tail pointing bottom-left -->
+  <polygon points="0,76 24,76 0,100" fill="#29B6F6"/>
+  <!-- "in" text in white -->
+  <text
+    x="42"
+    y="58"
+    text-anchor="middle"
+    font-family="Arial, Helvetica, sans-serif"
+    font-weight="900"
+    font-size="48"
+    fill="white"
+    letter-spacing="-1"
+  >in</text>
+</svg>

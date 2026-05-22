@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -85,8 +86,11 @@ export function Sidebar() {
   return (
     <aside className="flex h-screen w-56 flex-col bg-[#1a2744]">
       {/* Logo */}
-      <div className="flex h-14 items-center px-5 border-b border-white/10">
-        <span className="text-base font-bold text-white tracking-tight">InPro.ai</span>
+      <div className="flex h-14 items-center px-4 border-b border-white/10">
+        <div className="flex items-center gap-2">
+          <Image src="/icon.svg" alt="InPro" width={30} height={34} />
+          <span className="text-base font-black text-white tracking-tight">Pro</span>
+        </div>
       </div>
 
       {/* Nav */}

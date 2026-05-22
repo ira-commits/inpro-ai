@@ -6,9 +6,13 @@ import { TRPCProvider } from "@/lib/trpc/provider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "InPro.ai — AI Agent Platform for Consultants",
+  title: "InPro.ai — Clone and Monetize Your Expertise",
   description:
-    "Your AI agent runs your consulting business 24/7. Chat with clients, book sessions, summarize meetings, and automate back-office tasks.",
+    "Deploy your AI clone to chat with clients 24/7, book sessions, and run your back-office. Earn perpetuity on your knowledge.",
+  icons: {
+    icon: "/icon.svg",
+    apple: "/icon.svg",
+  },
 };
 
 export default function RootLayout({
