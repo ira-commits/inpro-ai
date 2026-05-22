@@ -1,17 +1,18 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 100">
-  <!-- Chat bubble background (rounded rect) -->
-  <rect x="0" y="0" width="84" height="76" rx="13" fill="#29B6F6"/>
-  <!-- Chat bubble tail pointing bottom-left -->
-  <polygon points="0,76 24,76 0,100" fill="#29B6F6"/>
-  <!-- "in" text in white -->
-  <text
-    x="42"
-    y="58"
-    text-anchor="middle"
-    font-family="Arial, Helvetica, sans-serif"
-    font-weight="900"
-    font-size="48"
-    fill="white"
-    letter-spacing="-1"
-  >in</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 108">
+  <!-- Chat bubble body -->
+  <rect x="0" y="0" width="92" height="80" rx="13" fill="#29B6F6"/>
+  <!-- Tail bottom-left -->
+  <polygon points="0,80 28,80 0,107" fill="#29B6F6"/>
+
+  <!-- i: dot -->
+  <circle cx="26" cy="21" r="8" fill="white"/>
+  <!-- i: stem -->
+  <rect x="18" y="34" width="16" height="32" rx="4" fill="white"/>
+
+  <!-- n: left stem (full height) -->
+  <rect x="44" y="22" width="15" height="44" rx="4" fill="white"/>
+  <!-- n: arch top bridge -->
+  <rect x="44" y="22" width="34" height="16" rx="8" fill="white"/>
+  <!-- n: right stem -->
+  <rect x="63" y="22" width="15" height="44" rx="4" fill="white"/>
 </svg>
