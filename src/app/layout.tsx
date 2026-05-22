@@ -10,8 +10,8 @@ export const metadata: Metadata = {
   description:
     "Deploy your AI clone to chat with clients 24/7, book sessions, and run your back-office. Earn perpetuity on your knowledge.",
   icons: {
-    icon: "/icon.svg",
-    apple: "/icon.svg",
+    icon: "/icon.png",
+    apple: "/icon.png",
   },
 };
 

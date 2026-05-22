@@ -88,7 +88,7 @@ export function Sidebar() {
       {/* Logo */}
       <div className="flex h-14 items-center px-4 border-b border-white/10">
         <div className="flex items-center gap-2">
-          <Image src="/icon.svg" alt="InPro" width={30} height={34} />
+          <Image src="/icon.png" alt="InPro" width={30} height={34} />
           <span className="text-base font-black text-white tracking-tight">Pro</span>
         </div>
       </div>

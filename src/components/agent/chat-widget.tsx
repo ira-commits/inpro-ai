@@ -141,7 +141,7 @@ export function ChatWidget({
           className="flex items-center gap-1 text-[10px] text-gray-300 hover:text-gray-400 transition-colors"
         >
           Powered by
-          <Image src="/logo.svg" alt="InPro.ai" width={40} height={18} className="opacity-50 hover:opacity-70 transition-opacity" />
+          <Image src="/logo.png" alt="InPro.ai" width={40} height={18} className="opacity-50 hover:opacity-70 transition-opacity" />
         </a>
       </div>
     </div>
