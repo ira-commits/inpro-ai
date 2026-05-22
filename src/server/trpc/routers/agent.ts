@@ -9,14 +9,11 @@ export const agentRouter = createTRPCRouter({
     const consultant = await ctx.db.query.consultants.findFirst({
       where: eq(consultants.userId, ctx.user.id),
     });
-
     if (!consultant) throw new TRPCError({ code: "NOT_FOUND" });
 
-    const agent = await ctx.db.query.agents.findFirst({
+    return ctx.db.query.agents.findFirst({
       where: eq(agents.consultantId, consultant.id),
-    });
-
-    return agent ?? null;
+    }) ?? null;
   }),
 
   upsertConfig: protectedProcedure
@@ -32,7 +29,6 @@ export const agentRouter = createTRPCRouter({
       const consultant = await ctx.db.query.consultants.findFirst({
         where: eq(consultants.userId, ctx.user.id),
       });
-
       if (!consultant) throw new TRPCError({ code: "NOT_FOUND" });
 
       const existing = await ctx.db.query.agents.findFirst({
@@ -53,5 +49,21 @@ export const agentRouter = createTRPCRouter({
         .values({ ...input, consultantId: consultant.id })
         .returning();
       return created;
+    }),
+
+  toggleActive: protectedProcedure
+    .input(z.object({ isActive: z.boolean() }))
+    .mutation(async ({ ctx, input }) => {
+      const consultant = await ctx.db.query.consultants.findFirst({
+        where: eq(consultants.userId, ctx.user.id),
+      });
+      if (!consultant) throw new TRPCError({ code: "NOT_FOUND" });
+
+      const [updated] = await ctx.db
+        .update(agents)
+        .set({ isActive: input.isActive })
+        .where(eq(agents.consultantId, consultant.id))
+        .returning();
+      return updated;
     }),
 });

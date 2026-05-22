@@ -8,9 +8,8 @@ import {
   pgEnum,
   jsonb,
   real,
-  unique,
 } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
+import { relations } from "drizzle-orm";
 
 // ─── Enums ───────────────────────────────────────────────────────────────────
 
@@ -205,6 +204,61 @@ export const automations = pgTable("automations", {
     .notNull()
     .defaultNow(),
 });
+
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+// ─── Relations ───────────────────────────────────────────────────────────────
+
+export const usersRelations = relations(users, ({ many }) => ({
+  consultants: many(consultants),
+}));
+
+export const consultantsRelations = relations(consultants, ({ one, many }) => ({
+  user: one(users, { fields: [consultants.userId], references: [users.id] }),
+  services: many(services),
+  agents: many(agents),
+  sessions: many(sessions),
+  conversations: many(conversations),
+  knowledgeChunks: many(knowledgeChunks),
+  automations: many(automations),
+}));
+
+export const servicesRelations = relations(services, ({ one }) => ({
+  consultant: one(consultants, { fields: [services.consultantId], references: [consultants.id] }),
+}));
+
+export const agentsRelations = relations(agents, ({ one }) => ({
+  consultant: one(consultants, { fields: [agents.consultantId], references: [consultants.id] }),
+}));
+
+export const knowledgeChunksRelations = relations(knowledgeChunks, ({ one }) => ({
+  consultant: one(consultants, { fields: [knowledgeChunks.consultantId], references: [consultants.id] }),
+}));
+
+export const sessionsRelations = relations(sessions, ({ one }) => ({
+  consultant: one(consultants, { fields: [sessions.consultantId], references: [consultants.id] }),
+  client: one(users, { fields: [sessions.clientId], references: [users.id] }),
+  service: one(services, { fields: [sessions.serviceId], references: [services.id] }),
+  transcript: one(transcripts, { fields: [sessions.id], references: [transcripts.sessionId] }),
+}));
+
+export const transcriptsRelations = relations(transcripts, ({ one }) => ({
+  session: one(sessions, { fields: [transcripts.sessionId], references: [sessions.id] }),
+}));
+
+export const conversationsRelations = relations(conversations, ({ one, many }) => ({
+  consultant: one(consultants, { fields: [conversations.consultantId], references: [consultants.id] }),
+  client: one(users, { fields: [conversations.clientId], references: [users.id] }),
+  messages: many(messages),
+}));
+
+export const messagesRelations = relations(messages, ({ one }) => ({
+  conversation: one(conversations, { fields: [messages.conversationId], references: [conversations.id] }),
+}));
+
+export const automationsRelations = relations(automations, ({ one }) => ({
+  consultant: one(consultants, { fields: [automations.consultantId], references: [consultants.id] }),
+}));
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
