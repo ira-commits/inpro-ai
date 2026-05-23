@@ -5,8 +5,13 @@ import { consultants, agents, knowledgeChunks } from "@/server/db/schema";
 import { eq, count } from "drizzle-orm";
 import { AgentConfigForm } from "@/components/consultant/agent-config-form";
 import { KnowledgeBasePanel } from "@/components/consultant/knowledge-base-panel";
+import { AgentTabs } from "@/components/consultant/agent-tabs";
 
-export default async function AgentPage() {
+export default async function AgentPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab?: string }>;
+}) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
@@ -25,30 +30,24 @@ export default async function AgentPage() {
     .from(knowledgeChunks)
     .where(eq(knowledgeChunks.consultantId, consultant.id));
 
+  const params = await searchParams;
+  const activeTab = params.tab ?? "resume";
+
   return (
-    <div className="p-8 max-w-4xl">
+    <div className="p-6 max-w-4xl">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-foreground">AI Agent</h1>
         <p className="text-muted-foreground mt-1">
-          Configure your agent&apos;s personality, knowledge, and behaviour.
+          Train your agent, configure its personality, and manage its knowledge base.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div>
-          <h2 className="text-base font-semibold text-foreground mb-3">Agent settings</h2>
-          <AgentConfigForm agent={agent} />
-        </div>
-        <div>
-          <h2 className="text-base font-semibold text-foreground mb-3">
-            Knowledge base
-            <span className="ml-2 text-xs font-normal text-muted-foreground">
-              {chunkCount?.count ?? 0} entries
-            </span>
-          </h2>
-          <KnowledgeBasePanel consultantId={consultant.id} />
-        </div>
-      </div>
+      <AgentTabs
+        activeTab={activeTab}
+        agent={agent}
+        consultantId={consultant.id}
+        chunkCount={chunkCount?.count ?? 0}
+      />
     </div>
   );
 }
