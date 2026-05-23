@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { eq } from "drizzle-orm";
+import { eq, ilike, or, and } from "drizzle-orm";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
-import { consultants, services, agents } from "@/server/db/schema";
+import { consultants, services, agents, users } from "@/server/db/schema";
 import { TRPCError } from "@trpc/server";
 
 export const consultantsRouter = createTRPCRouter({
@@ -18,6 +18,7 @@ export const consultantsRouter = createTRPCRouter({
             where: eq(agents.isActive, true),
             limit: 1,
           },
+          user: true,
         },
       });
 
@@ -26,6 +27,42 @@ export const consultantsRouter = createTRPCRouter({
       }
 
       return consultant;
+    }),
+
+  // Browse / search published consultants
+  search: publicProcedure
+    .input(
+      z.object({
+        query: z.string().optional(),
+        limit: z.number().min(1).max(50).default(20),
+        offset: z.number().default(0),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const { query, limit, offset } = input;
+
+      // Pull published consultants with their user record + services
+      const rows = await ctx.db.query.consultants.findMany({
+        where: and(
+          eq(consultants.isPublished, true),
+          query
+            ? or(
+                ilike(consultants.headline, `%${query}%`),
+                ilike(consultants.bio, `%${query}%`),
+                ilike(consultants.slug, `%${query}%`)
+              )
+            : undefined
+        ),
+        with: {
+          services: { where: eq(services.isActive, true) },
+          agents: { where: eq(agents.isActive, true), limit: 1 },
+          user: true,
+        },
+        limit,
+        offset,
+      });
+
+      return rows;
     }),
 
   getMyProfile: protectedProcedure.query(async ({ ctx }) => {
@@ -71,4 +108,13 @@ export const consultantsRouter = createTRPCRouter({
         .returning();
       return created;
     }),
+
+  publish: protectedProcedure.mutation(async ({ ctx }) => {
+    const [updated] = await ctx.db
+      .update(consultants)
+      .set({ isPublished: true })
+      .where(eq(consultants.userId, ctx.user.id))
+      .returning();
+    return updated;
+  }),
 });

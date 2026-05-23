@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useOnboardingStore } from "@/store/onboarding";
 import { StepIndicator } from "./step-indicator";
 import { ProfileStep } from "./profile-step";
@@ -21,8 +22,26 @@ const STEP_TITLES: Record<string, { title: string; subtitle: string }> = {
   },
 };
 
-export function OnboardingShell() {
-  const { step } = useOnboardingStore();
+interface OnboardingShellProps {
+  suggestedSlug?: string;
+  avatarUrl?: string | null;
+  fullName?: string | null;
+}
+
+export function OnboardingShell({
+  suggestedSlug = "",
+  avatarUrl,
+  fullName,
+}: OnboardingShellProps) {
+  const { step, setProfile } = useOnboardingStore();
+
+  // Pre-fill slug from LinkedIn name on first mount
+  useEffect(() => {
+    if (suggestedSlug) {
+      setProfile({ slug: suggestedSlug });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (step === "done") return null;
 
@@ -34,13 +53,15 @@ export function OnboardingShell() {
         <StepIndicator current={step} />
       </div>
 
-      <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
         <div className="mb-5">
-          <h2 className="text-lg font-semibold text-foreground">{title}</h2>
-          <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>
+          <h2 className="text-base font-bold text-[#1a2744]">{title}</h2>
+          <p className="text-sm text-gray-500 mt-0.5">{subtitle}</p>
         </div>
 
-        {step === "profile" && <ProfileStep />}
+        {step === "profile" && (
+          <ProfileStep avatarUrl={avatarUrl} fullName={fullName} />
+        )}
         {step === "services" && <ServicesStep />}
         {step === "agent" && <AgentStep />}
       </div>

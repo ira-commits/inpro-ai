@@ -1,7 +1,8 @@
 import { z } from "zod";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { knowledgeChunks } from "@/server/db/schema";
+import { generateEmbedding } from "@/lib/embeddings";
 
 export const knowledgeRouter = createTRPCRouter({
   list: protectedProcedure
@@ -26,6 +27,22 @@ export const knowledgeRouter = createTRPCRouter({
         .insert(knowledgeChunks)
         .values({ consultantId: input.consultantId, content: input.content, source: "manual" })
         .returning();
+
+      // Generate and store embedding — fire-and-forget so the UI responds immediately
+      generateEmbedding(input.content).then(async (embedding) => {
+        if (!embedding) return;
+        try {
+          const vectorLiteral = `[${embedding.join(",")}]`;
+          await ctx.db.execute(sql`
+            UPDATE knowledge_chunks
+            SET embedding = ${vectorLiteral}::vector
+            WHERE id = ${created.id}
+          `);
+        } catch (err) {
+          console.error("[knowledge] Failed to store embedding:", err);
+        }
+      });
+
       return created;
     }),
 

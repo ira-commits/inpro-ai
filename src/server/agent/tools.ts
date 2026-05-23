@@ -1,10 +1,11 @@
 import { tool } from "ai";
 import { z } from "zod";
 import { db } from "@/server/db";
-import { conversations } from "@/server/db/schema";
+import { conversations, consultants } from "@/server/db/schema";
 import { eq } from "drizzle-orm";
 import type { Service } from "@/server/db/schema";
 import { formatCents, formatDuration } from "@/lib/utils";
+import { getAvailableSlots, formatAvailability } from "@/lib/cal";
 
 interface ToolContext {
   consultantId: string;
@@ -49,14 +50,50 @@ export function buildTools(context: ToolContext) {
           .optional()
           .describe("The client's preferred date in natural language, e.g. 'next Tuesday'"),
       }),
-      execute: async ({ serviceId, preferredDate }) => {
-        // Cal.com integration goes here — returning a placeholder for now
-        void serviceId;
-        void preferredDate;
+      execute: async ({ serviceId }) => {
+        // Load consultant's Cal.com username and timezone
+        const consultant = await db.query.consultants.findFirst({
+          where: eq(consultants.id, consultantId),
+        });
+
+        const calUsername = consultant?.calUsername;
+        const timezone = consultant?.timezone ?? "UTC";
+
+        // Find the requested service for duration
+        const service = serviceId
+          ? services.find((s) => s.id === serviceId)
+          : services.find((s) => s.isActive);
+        const durationMinutes = service?.durationMinutes ?? 60;
+
+        // Attempt to fetch real availability from Cal.com
+        if (calUsername) {
+          const bookingUrl = `https://cal.com/${calUsername}`;
+          const availability = await getAvailableSlots(calUsername, durationMinutes);
+
+          if (availability) {
+            const slotsText = formatAvailability(availability, timezone);
+            return {
+              available: true,
+              slots: slotsText,
+              bookingUrl,
+              message: `Here are the available times for the next week:\n\n${slotsText}\n\nYou can book directly at: ${bookingUrl}`,
+            };
+          }
+
+          // Cal.com configured but API call failed — give direct booking link
+          return {
+            available: true,
+            bookingUrl,
+            message: `You can view live availability and book directly at: ${bookingUrl}`,
+          };
+        }
+
+        // No Cal.com set up yet — collect email and preferred time
         return {
-          message:
-            "Calendar booking is being set up. For now, please provide your email and preferred time and I'll pass this directly to the consultant to confirm.",
+          available: null,
           requiresEmail: true,
+          message:
+            "I'd love to get you booked in. Could you share your email address and a couple of times that work for you? I'll confirm the details directly.",
         };
       },
     }),
